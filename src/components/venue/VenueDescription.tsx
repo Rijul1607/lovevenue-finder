@@ -3,6 +3,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Venue } from '@/utils/data';
+import VenueMap from './VenueMap';
 
 interface VenueDescriptionProps {
   venue: Venue;
@@ -42,10 +43,7 @@ const VenueDescription = ({ venue }: VenueDescriptionProps) => {
       <section className="mb-8">
         <h2 className="text-2xl font-serif mb-4">Location</h2>
         <p className="text-muted-foreground mb-4">{venue.address}, {venue.city}</p>
-        {/* Map placeholder - In a real app, this would be Google Maps or similar */}
-        <div className="bg-muted rounded-xl h-80 flex items-center justify-center">
-          <p className="text-muted-foreground">Map view would be displayed here</p>
-        </div>
+        <VenueMap venue={venue} />
       </section>
     </>
   );
