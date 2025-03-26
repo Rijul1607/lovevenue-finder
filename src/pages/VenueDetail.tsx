@@ -11,6 +11,8 @@ import VenueHeader from '../components/venue/VenueHeader';
 import VenueGallery from '../components/venue/VenueGallery';
 import VenueDescription from '../components/venue/VenueDescription';
 import BookingCard from '../components/venue/BookingCard';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +20,7 @@ const VenueDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (id) {
@@ -28,14 +31,87 @@ const VenueDetail = () => {
     }
   }, [id]);
 
-  const handleAddToWishlist = () => {
-    setIsWishlisted(!isWishlisted);
+  // Check if venue is in user's wishlist
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (!user || !id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('wishlists')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('venue_id', id)
+          .single();
+        
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error checking wishlist status:', error);
+          return;
+        }
+        
+        setIsWishlisted(!!data);
+      } catch (error) {
+        console.error('Error checking wishlist:', error);
+      }
+    };
     
-    // In a real app, this would be an API call to add/remove from wishlist
-    toast({
-      title: isWishlisted ? "Removed from wishlist" : "Added to wishlist",
-      description: isWishlisted ? "This venue has been removed from your wishlist." : "This venue has been added to your wishlist.",
-    });
+    checkWishlistStatus();
+  }, [user, id]);
+
+  const handleAddToWishlist = async () => {
+    if (!user || !venue) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save venues to your wishlist.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      if (isWishlisted) {
+        // Remove from wishlist
+        const { error } = await supabase
+          .from('wishlists')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('venue_id', venue.id);
+        
+        if (error) throw error;
+        
+        setIsWishlisted(false);
+        toast({
+          title: "Removed from wishlist",
+          description: "This venue has been removed from your wishlist.",
+        });
+      } else {
+        // Add to wishlist
+        const { error } = await supabase
+          .from('wishlists')
+          .insert({
+            user_id: user.id,
+            venue_id: venue.id,
+            venue_name: venue.name,
+            venue_image: venue.images.main,
+            venue_price: venue.price,
+            venue_city: venue.city
+          });
+        
+        if (error) throw error;
+        
+        setIsWishlisted(true);
+        toast({
+          title: "Added to wishlist",
+          description: "This venue has been added to your wishlist.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Action failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDateSelect = (date: string) => {

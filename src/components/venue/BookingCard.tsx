@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Venue, formatPrice, formatDate } from '@/utils/data';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 
 interface BookingCardProps {
   venue: Venue;
@@ -13,7 +16,20 @@ interface BookingCardProps {
 }
 
 const BookingCard = ({ venue, selectedDate, onDateSelect }: BookingCardProps) => {
-  const handleBookNow = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleBookNow = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to book this venue.",
+        variant: "destructive",
+      });
+      navigate('/signin');
+      return;
+    }
+
     if (!selectedDate) {
       toast({
         title: "Please select a date",
@@ -23,11 +39,35 @@ const BookingCard = ({ venue, selectedDate, onDateSelect }: BookingCardProps) =>
       return;
     }
     
-    // In a real app, this would redirect to booking page or open a booking modal
-    toast({
-      title: "Booking initiated",
-      description: `Your booking for ${venue.name} on ${formatDate(selectedDate)} is being processed.`,
-    });
+    try {
+      // Store the booking in the database
+      const { error } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: user.id,
+          venue_id: venue.id,
+          booking_date: selectedDate,
+          venue_name: venue.name,
+          venue_price: venue.price,
+          status: 'pending'
+        });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Booking successful",
+        description: `Your booking for ${venue.name} on ${formatDate(selectedDate)} has been confirmed.`,
+      });
+      
+      // Navigate to a booking confirmation or bookings list page
+      navigate('/wishlist'); // You may want to create a bookings page instead
+    } catch (error: any) {
+      toast({
+        title: "Booking failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -87,7 +127,7 @@ const BookingCard = ({ venue, selectedDate, onDateSelect }: BookingCardProps) =>
       {/* Action Buttons */}
       <div className="space-y-3">
         <Button className="w-full" onClick={handleBookNow}>
-          Book Now
+          {user ? 'Book Now' : 'Sign In to Book'}
         </Button>
         <Button variant="outline" className="w-full">
           Contact Venue

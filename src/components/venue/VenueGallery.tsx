@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { Venue } from '@/utils/data';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 interface VenueGalleryProps {
   venue: Venue;
@@ -12,6 +15,22 @@ interface VenueGalleryProps {
 const VenueGallery = ({ venue, isWishlisted, onWishlistToggle }: VenueGalleryProps) => {
   const [mainImageLoaded, setMainImageLoaded] = useState(false);
   const [activeImage, setActiveImage] = useState<string>(venue.images.main);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleWishlistClick = () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save venues to your wishlist.",
+        variant: "destructive",
+      });
+      navigate('/signin');
+      return;
+    }
+    
+    onWishlistToggle();
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
@@ -30,7 +49,7 @@ const VenueGallery = ({ venue, isWishlisted, onWishlistToggle }: VenueGalleryPro
         </div>
         
         <button 
-          onClick={onWishlistToggle}
+          onClick={handleWishlistClick}
           className="absolute top-4 right-4 z-10 rounded-full bg-black/20 p-3 backdrop-blur-md transition-colors hover:bg-black/30"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >

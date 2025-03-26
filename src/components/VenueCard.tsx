@@ -1,9 +1,12 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Star, Users, MapPin } from 'lucide-react';
 import { Venue, formatPrice } from '../utils/data';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
 
 interface VenueCardProps {
   venue: Venue;
@@ -13,12 +16,94 @@ interface VenueCardProps {
 const VenueCard = ({ venue, className }: VenueCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const toggleLike = (e: React.MouseEvent) => {
+  // Check if the venue is in the user's wishlist
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('wishlists')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('venue_id', venue.id)
+          .single();
+        
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error checking wishlist status:', error);
+          return;
+        }
+        
+        setIsLiked(!!data);
+      } catch (error) {
+        console.error('Error checking wishlist:', error);
+      }
+    };
+    
+    checkWishlistStatus();
+  }, [user, venue.id]);
+
+  const toggleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsLiked(!isLiked);
-    // In a real app, we would update this in a wishlist context or API
+    
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save venues to your wishlist.",
+        variant: "destructive",
+      });
+      navigate('/signin');
+      return;
+    }
+    
+    try {
+      if (isLiked) {
+        // Remove from wishlist
+        const { error } = await supabase
+          .from('wishlists')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('venue_id', venue.id);
+        
+        if (error) throw error;
+        
+        setIsLiked(false);
+        toast({
+          title: "Removed from wishlist",
+          description: "Venue has been removed from your wishlist.",
+        });
+      } else {
+        // Add to wishlist
+        const { error } = await supabase
+          .from('wishlists')
+          .insert({
+            user_id: user.id,
+            venue_id: venue.id,
+            venue_name: venue.name,
+            venue_image: venue.images.main,
+            venue_price: venue.price,
+            venue_city: venue.city
+          });
+        
+        if (error) throw error;
+        
+        setIsLiked(true);
+        toast({
+          title: "Added to wishlist",
+          description: "Venue has been added to your wishlist.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Action failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
