@@ -147,13 +147,23 @@ const Wishlist = () => {
             <div className="mb-16">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {wishlistVenues.map((venue) => (
-                  <VenueCard key={venue.id} venue={venue} />
+                  <div key={venue.id} className="relative">
+                    <Button 
+                      variant="destructive" 
+                      size="icon" 
+                      className="absolute top-2 right-2 z-10"
+                      onClick={() => removeFromWishlist(venue.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <VenueCard venue={venue} />
+                  </div>
                 ))}
               </div>
               
               <div className="mt-8 flex flex-col items-center">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Want to remove a venue from your wishlist? Visit the venue page and click the heart icon.
+                  Want to discover more venues to add to your wishlist?
                 </p>
                 <Button asChild variant="outline">
                   <Link to="/venues">Discover more venues</Link>

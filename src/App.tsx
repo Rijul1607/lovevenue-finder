@@ -11,6 +11,8 @@ import VenueDetail from "./pages/VenueDetail";
 import Venues from "./pages/Venues";
 import Wishlist from "./pages/Wishlist";
 import Booking from "./pages/Booking";
+import MyBookings from "./pages/MyBookings";
+import Profile from "./pages/Profile";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import SignIn from "./pages/SignIn";
@@ -45,6 +47,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Booking />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/bookings" 
+              element={
+                <ProtectedRoute>
+                  <MyBookings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               } 
             />
