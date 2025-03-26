@@ -56,6 +56,13 @@ const Wishlist = () => {
             main: item.venue_image,
             gallery: [item.venue_image] // Just use the main image
           },
+          // Add missing properties required by Venue type
+          address: 'Address information not available',
+          featured: false,
+          coordinates: {
+            lat: 0,
+            lng: 0
+          },
           availability: ['2023-07-01'], // Default value
           description: '',
           amenities: [],
