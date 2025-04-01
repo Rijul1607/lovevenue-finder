@@ -16,6 +16,7 @@ import BookingDetails from "./pages/BookingDetails";
 import Profile from "./pages/Profile";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
+import ContactVenue from "./pages/ContactVenue";
 import About from "./pages/About";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -37,6 +38,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/venue/:id" element={<VenueDetail />} />
+            <Route path="/venue/:id/contact" element={<ContactVenue />} />
             <Route path="/venues" element={<Venues />} />
             <Route path="/about" element={<About />} />
             <Route path="/signin" element={<SignIn />} />

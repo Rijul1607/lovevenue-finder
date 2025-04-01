@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Venue, formatPrice, formatDate } from '@/utils/data';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 
 interface BookingCardProps {
@@ -140,8 +140,10 @@ const BookingCard = ({ venue, selectedDate, onDateSelect }: BookingCardProps) =>
         <Button className="w-full" onClick={handleBookNow}>
           {user ? 'Book Now' : 'Sign In to Book'}
         </Button>
-        <Button variant="outline" className="w-full">
-          Contact Venue
+        <Button variant="outline" className="w-full" asChild>
+          <Link to={`/venue/${venue.id}/contact`}>
+            Contact Venue
+          </Link>
         </Button>
       </div>
 
