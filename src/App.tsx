@@ -12,9 +12,11 @@ import Venues from "./pages/Venues";
 import Wishlist from "./pages/Wishlist";
 import Booking from "./pages/Booking";
 import MyBookings from "./pages/MyBookings";
+import BookingDetails from "./pages/BookingDetails";
 import Profile from "./pages/Profile";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
+import About from "./pages/About";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
@@ -32,6 +34,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/venue/:id" element={<VenueDetail />} />
             <Route path="/venues" element={<Venues />} />
+            <Route path="/about" element={<About />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route 
@@ -55,6 +58,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MyBookings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/booking-details/:id" 
+              element={
+                <ProtectedRoute>
+                  <BookingDetails />
                 </ProtectedRoute>
               } 
             />
