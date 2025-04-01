@@ -40,16 +40,27 @@ const BookingCard = ({ venue, selectedDate, onDateSelect }: BookingCardProps) =>
     }
     
     try {
+      // Calculate check-out date (1 day after check-in for simplicity)
+      const checkInDate = new Date(selectedDate);
+      const checkOutDate = new Date(checkInDate);
+      checkOutDate.setDate(checkOutDate.getDate() + 1);
+      
+      // Generate total price (for demo: 1 day rental + 15% fees)
+      const totalPrice = venue.price * 1.15;
+      
       // Store the booking in the database
       const { error } = await supabase
         .from('bookings')
         .insert({
           user_id: user.id,
           venue_id: venue.id,
-          booking_date: selectedDate,
           venue_name: venue.name,
-          venue_price: venue.price,
-          status: 'pending'
+          venue_image: venue.images.main,
+          check_in_date: selectedDate,
+          check_out_date: checkOutDate.toISOString().split('T')[0],
+          guests: venue.capacity.min,
+          total_price: totalPrice,
+          status: 'confirmed'
         });
       
       if (error) throw error;
@@ -59,8 +70,8 @@ const BookingCard = ({ venue, selectedDate, onDateSelect }: BookingCardProps) =>
         description: `Your booking for ${venue.name} on ${formatDate(selectedDate)} has been confirmed.`,
       });
       
-      // Navigate to a booking confirmation or bookings list page
-      navigate('/wishlist'); // You may want to create a bookings page instead
+      // Navigate to the bookings page
+      navigate('/bookings');
     } catch (error: any) {
       toast({
         title: "Booking failed",
