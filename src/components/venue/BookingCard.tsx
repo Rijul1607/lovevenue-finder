@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, Users } from 'lucide-react';
+import { Calendar, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Venue, formatPrice, formatDate } from '@/utils/data';
@@ -86,6 +86,15 @@ const BookingCard = ({ venue, selectedDate, onDateSelect }: BookingCardProps) =>
       <div className="mb-4">
         <p className="text-xl font-medium mb-1">{formatPrice(venue.price)}</p>
         <p className="text-muted-foreground text-sm">per day</p>
+      </div>
+
+      {/* Rating info */}
+      <div className="flex items-center mb-4">
+        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+        <span>{venue.rating} · </span>
+        <span className="text-muted-foreground ml-1">
+          {venue.reviewCount} review{venue.reviewCount !== 1 ? 's' : ''}
+        </span>
       </div>
 
       <Separator className="my-4" />

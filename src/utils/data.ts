@@ -1,4 +1,3 @@
-
 export interface Venue {
   id: string;
   name: string;
@@ -24,6 +23,16 @@ export interface Venue {
     lat: number;
     lng: number;
   };
+  reviews?: Review[];
+}
+
+export interface Review {
+  id: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  date: string;
 }
 
 export interface Filter {
@@ -96,7 +105,25 @@ export const venuesData: Venue[] = [
     coordinates: {
       lat: 40.7128,
       lng: -74.0060
-    }
+    },
+    reviews: [
+      {
+        id: "r1",
+        userId: "user1",
+        userName: "Sarah Johnson",
+        rating: 5,
+        comment: "This venue was absolutely perfect for our wedding! The staff was incredibly attentive and the space is gorgeous.",
+        date: "2024-03-15"
+      },
+      {
+        id: "r2",
+        userId: "user2",
+        userName: "Michael Chen",
+        rating: 4,
+        comment: "Beautiful location with excellent amenities. Only small issue was parking for some guests.",
+        date: "2024-02-28"
+      }
+    ]
   },
   {
     id: "seaside-villa",
@@ -136,7 +163,25 @@ export const venuesData: Venue[] = [
     coordinates: {
       lat: 25.7617,
       lng: -80.1918
-    }
+    },
+    reviews: [
+      {
+        id: "r3",
+        userId: "user3",
+        userName: "Emma Garcia",
+        rating: 5,
+        comment: "The ocean view was breathtaking! Our guests couldn't stop talking about how beautiful everything was.",
+        date: "2024-03-10"
+      },
+      {
+        id: "r4",
+        userId: "user4",
+        userName: "David Smith",
+        rating: 4,
+        comment: "Amazing venue with excellent service. Slightly pricey but worth every penny for our special day.",
+        date: "2024-02-20"
+      }
+    ]
   },
   {
     id: "garden-retreat",
@@ -176,7 +221,17 @@ export const venuesData: Venue[] = [
     coordinates: {
       lat: 41.8781,
       lng: -87.6298
-    }
+    },
+    reviews: [
+      {
+        id: "r5",
+        userId: "user5",
+        userName: "Jessica Lee",
+        rating: 5,
+        comment: "The gardens were in full bloom for our wedding and it was magical! Couldn't have asked for a better venue.",
+        date: "2024-03-05"
+      }
+    ]
   },
   {
     id: "mountain-lodge",
@@ -216,7 +271,17 @@ export const venuesData: Venue[] = [
     coordinates: {
       lat: 39.7392,
       lng: -104.9903
-    }
+    },
+    reviews: [
+      {
+        id: "r6",
+        userId: "user6",
+        userName: "Robert Wilson",
+        rating: 4,
+        comment: "The mountain views were stunning and the lodge itself is cozy yet elegant. Great for our winter wedding.",
+        date: "2024-02-15"
+      }
+    ]
   },
   {
     id: "historic-mansion",
@@ -256,7 +321,17 @@ export const venuesData: Venue[] = [
     coordinates: {
       lat: 42.3601,
       lng: -71.0589
-    }
+    },
+    reviews: [
+      {
+        id: "r7",
+        userId: "user7",
+        userName: "Olivia Taylor",
+        rating: 5,
+        comment: "This mansion has so much character and history. Our guests loved exploring all the beautiful rooms.",
+        date: "2024-03-01"
+      }
+    ]
   },
   {
     id: "urban-loft",
@@ -296,11 +371,20 @@ export const venuesData: Venue[] = [
     coordinates: {
       lat: 37.7749,
       lng: -122.4194
-    }
+    },
+    reviews: [
+      {
+        id: "r8",
+        userId: "user8",
+        userName: "Daniel Brown",
+        rating: 4,
+        comment: "Modern, sleek space that was perfect for our minimalist wedding theme. Great city views!",
+        date: "2024-02-25"
+      }
+    ]
   }
 ];
 
-// Helper functions
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -323,25 +407,20 @@ export const getVenueById = (id: string): Venue | undefined => {
   return venuesData.find(venue => venue.id === id);
 };
 
-// Filter venues by criteria
 export const filterVenues = (venues: Venue[], filters: Filter): Venue[] => {
   return venues.filter(venue => {
-    // Filter by location
     if (filters.location && !venue.city.toLowerCase().includes(filters.location.toLowerCase())) {
       return false;
     }
     
-    // Filter by price range
     if (venue.price < filters.priceRange[0] || venue.price > filters.priceRange[1]) {
       return false;
     }
     
-    // Filter by guest count
     if (filters.guestCount > venue.capacity.max || filters.guestCount < venue.capacity.min) {
       return false;
     }
     
-    // Filter by amenities
     if (filters.amenities.length > 0) {
       const hasAllAmenities = filters.amenities.every(amenity => 
         venue.amenities.includes(amenity)
@@ -349,7 +428,6 @@ export const filterVenues = (venues: Venue[], filters: Filter): Venue[] => {
       if (!hasAllAmenities) return false;
     }
     
-    // Filter by date
     if (filters.date && !venue.availability.includes(filters.date)) {
       return false;
     }

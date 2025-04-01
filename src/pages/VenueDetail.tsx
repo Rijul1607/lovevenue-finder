@@ -5,11 +5,12 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Venue, getVenueById } from '../utils/data';
+import { Venue, Review, getVenueById } from '../utils/data';
 import { toast } from '@/hooks/use-toast';
 import VenueHeader from '../components/venue/VenueHeader';
 import VenueGallery from '../components/venue/VenueGallery';
 import VenueDescription from '../components/venue/VenueDescription';
+import VenueReviews from '../components/venue/VenueReviews';
 import BookingCard from '../components/venue/BookingCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -118,6 +119,24 @@ const VenueDetail = () => {
     setSelectedDate(date);
   };
 
+  const handleReviewAdded = (newReview: Review) => {
+    if (venue) {
+      const updatedReviews = venue.reviews ? [...venue.reviews, newReview] : [newReview];
+      
+      // Calculate new average rating
+      const totalRating = updatedReviews.reduce((sum, review) => sum + review.rating, 0);
+      const newAverageRating = totalRating / updatedReviews.length;
+      
+      // Update venue with new review and rating
+      setVenue({
+        ...venue,
+        reviews: updatedReviews,
+        rating: parseFloat(newAverageRating.toFixed(1)),
+        reviewCount: updatedReviews.length
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -169,6 +188,12 @@ const VenueDetail = () => {
             {/* Left Column - Venue Details */}
             <div className="lg:col-span-2">
               <VenueDescription venue={venue} />
+              
+              {/* Reviews Section */}
+              <VenueReviews 
+                venue={venue} 
+                onReviewAdded={handleReviewAdded} 
+              />
             </div>
 
             {/* Right Column - Booking Card */}

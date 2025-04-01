@@ -38,10 +38,21 @@ CREATE TABLE IF NOT EXISTS bookings (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
+-- Venue reviews table to store user reviews of venues
+CREATE TABLE IF NOT EXISTS venue_reviews (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  venue_id TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
 -- Add RLS policies
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wishlists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE venue_reviews ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
 CREATE POLICY "Users can view their own profile" 
@@ -88,6 +99,23 @@ CREATE POLICY "Users can update their own bookings"
 
 CREATE POLICY "Users can delete their own bookings" 
   ON bookings FOR DELETE 
+  USING (auth.uid() = user_id);
+
+-- Venue reviews policies
+CREATE POLICY "Anyone can view venue reviews" 
+  ON venue_reviews FOR SELECT 
+  USING (true);
+
+CREATE POLICY "Users can insert their own reviews" 
+  ON venue_reviews FOR INSERT 
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own reviews" 
+  ON venue_reviews FOR UPDATE 
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own reviews" 
+  ON venue_reviews FOR DELETE 
   USING (auth.uid() = user_id);
 
 -- Triggers for updated_at
