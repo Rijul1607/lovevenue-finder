@@ -10,7 +10,7 @@ import { toast } from '@/hooks/use-toast';
 import VenueHeader from '../components/venue/VenueHeader';
 import VenueGallery from '../components/venue/VenueGallery';
 import VenueDescription from '../components/venue/VenueDescription';
-import VenueReviews from '../components/venue/VenueReviews';
+// import VenueReviews from '../components/venue/VenueReviews';
 import BookingCard from '../components/venue/BookingCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -190,10 +190,7 @@ const VenueDetail = () => {
               <VenueDescription venue={venue} />
               
               {/* Reviews Section */}
-              <VenueReviews 
-                venue={venue} 
-                onReviewAdded={handleReviewAdded} 
-              />
+              
             </div>
 
             {/* Right Column - Booking Card */}
