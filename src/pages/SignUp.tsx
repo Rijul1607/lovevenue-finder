@@ -17,6 +17,8 @@ import {
 import { Input } from '@/components/ui/input';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const formSchema = z.object({
   fullName: z.string().min(2, { 
@@ -63,6 +65,14 @@ const SignUp = () => {
               Sign up to start planning your perfect event
             </p>
           </div>
+          
+          <Alert className="mb-6 bg-blue-50 border-blue-200">
+            <AlertCircle className="h-4 w-4 text-blue-500" />
+            <AlertDescription className="text-blue-700">
+              You'll need to verify your email address before signing in. 
+              We'll send you a verification link after sign up.
+            </AlertDescription>
+          </Alert>
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

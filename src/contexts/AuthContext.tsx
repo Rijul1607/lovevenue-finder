@@ -58,6 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: `${window.location.origin}/signin`,
         },
       });
 
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data) {
         toast({
           title: "Verification email sent",
-          description: "Please check your email to verify your account.",
+          description: "Please check your email to verify your account before signing in.",
         });
         navigate('/signin');
       }
@@ -93,6 +94,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (data) {
+        if (!data.user.email_confirmed_at) {
+          toast({
+            title: "Email not verified",
+            description: "Please check your email and verify your account before signing in.",
+            variant: "destructive",
+          });
+          await supabase.auth.signOut();
+          return;
+        }
+        
         toast({
           title: "Successfully signed in",
           description: "Welcome back!",
